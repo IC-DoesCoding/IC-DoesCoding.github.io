@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quizbowl Canon Finder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@400;500&family=Geist:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header>
+    <div class="header-inner">
+      <div class="eyebrow">Quizbowl Research Tool</div>
+      <h1>Canon <em>Finder</em></h1>
+      <p>Search any answer to find which clues appear most across Quizbowl questions.</p>
+    </div>
+  </header>
+
+  <main>
+
+    <form id="searchForm">
+      <div class="search-row">
+        <input
+          type="text"
+          id="queryInput"
+          placeholder="e.g. viscosity, Hamlet, Treaty of Versailles…"
+          autocomplete="off"
+          spellcheck="false"
+        >
+        <button type="submit" id="searchBtn">Search</button>
+      </div>
+      <div class="search-options">
+        <label>
+          Sort by
+          <select id="sortBy">
+            <option value="combined">Combined score</option>
+            <option value="common">Most questions</option>
+            <option value="hard">Hard clues first</option>
+          </select>
+        </label>
+        <label>
+          Similarity
+          <div class="range-row">
+            <input type="range" id="threshold" min="0.20" max="0.80" step="0.05" value="0.45">
+            <span id="thresholdVal">0.45</span>
+          </div>
+        </label>
+        <label>
+          Show top
+          <select id="topN">
+            <option value="10">10 clusters</option>
+            <option value="15" selected>15 clusters</option>
+            <option value="25">25 clusters</option>
+            <option value="999">All</option>
+          </select>
+        </label>
+      </div>
+    </form>
+
+    <div id="status" class="status" hidden></div>
+
+    <div id="statsStrip" class="stats-strip" hidden>
+      <div class="stat">
+        <div class="stat-val" id="statQ">–</div>
+        <div class="stat-lbl">Questions found</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val" id="statC">–</div>
+        <div class="stat-lbl">Clues analysed</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val" id="statK">–</div>
+        <div class="stat-lbl">Canon clusters</div>
+      </div>
+    </div>
+
+    <div id="results"></div>
+
+  </main>
+
+  <footer>
+    Data via <a href="https://www.qbreader.org" target="_blank" rel="noopener">QBreader</a>
+    · all processing in-browser
+  </footer>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
