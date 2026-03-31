@@ -29,6 +29,7 @@ export async function fetchTossups(answerQuery, { maxQuestions = 150, pageSize =
       queryString:      answerQuery,
       questionType:     'tossup',
       searchType:       'answer',
+      exactPhrase:      true,
       maxReturnLength:  pageSize,
       tossupPagination: page,
     });
@@ -37,7 +38,8 @@ export async function fetchTossups(answerQuery, { maxQuestions = 150, pageSize =
     if (!res.ok) throw new Error(`QBreader API error: ${res.status} ${res.statusText}`);
 
     const data = await res.json();
-    const batch = data.tossups?.tossups ?? [];
+    console.log('[api] raw response:', data);
+    const batch = data.tossups?.questionArray ?? [];
 
     if (!batch.length) break;   // no more results
     tossups.push(...batch);

@@ -46,10 +46,13 @@ async function runSearch(query) {
   try {
     tossups = await fetchTossups(query);
   } catch (err) {
+    console.error('[main] fetch error:', err);
     showStatus(`Failed to fetch questions: ${err.message}`, { error: true });
     searchBtn.disabled = false;
     return;
   }
+
+  console.log('[main] tossups received:', tossups.length, tossups[0]);
 
   if (!tossups.length) {
     showStatus(`No tossups found for "${query}". Try a different spelling or answer.`, { error: true });
@@ -61,9 +64,10 @@ async function runSearch(query) {
   await tick();
 
   const clues = extractClues(tossups);
+  console.log('[main] clues extracted:', clues.length, clues[0]);
 
   if (!clues.length) {
-    showStatus('No clues could be extracted from those questions.', { error: true });
+    showStatus('No clues could be extracted. Check the console for details.', { error: true });
     searchBtn.disabled = false;
     return;
   }

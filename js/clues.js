@@ -122,7 +122,8 @@ export function difficultyLabel(idx, total) {
 export function extractClues(tossups) {
   const clues = [];
   tossups.forEach((tossup, qIdx) => {
-    const sentences = splitSentences(tossup.question_sanitized ?? '');
+    const text = tossup.question_sanitized ?? tossup.question ?? '';
+    const sentences = splitSentences(text);
     const total = sentences.length;
     sentences.forEach((s, sIdx) => {
       if (!isGiveaway(s)) {
