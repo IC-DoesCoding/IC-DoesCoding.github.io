@@ -64,7 +64,6 @@ async function runSearch(query) {
   await tick();
 
   const clues = extractClues(tossups);
-  console.log('[main] clues extracted:', clues.length, clues[0]);
 
   if (!clues.length) {
     showStatus('No clues could be extracted. Check the console for details.', { error: true });

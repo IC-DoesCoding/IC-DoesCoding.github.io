@@ -7,9 +7,35 @@
  *
  * QBreader paginates at maxReturnLength per page; we walk pages until we
  * have collected all available tossups.
+ *
+ * CORS note: QBreader's API does not send Access-Control-Allow-Origin headers,
+ * so direct browser fetches are blocked on deployed sites (e.g. GitHub Pages).
+ * We first try a direct fetch; if it fails with a CORS/network error we retry
+ * through allorigins.win, a free public CORS proxy.
  */
 
-const BASE = 'https://www.qbreader.org/api';
+const QBREADER = 'https://www.qbreader.org/api';
+const CORS_PROXY = 'https://api.allorigins.win/raw?url=';
+
+/**
+ * Fetch a URL, falling back to the CORS proxy if the direct request fails.
+ *
+ * @param {string} url
+ * @returns {Promise<Response>}
+ */
+async function fetchWithFallback(url) {
+  try {
+    const res = await fetch(url);
+    // Some browsers return an opaque response instead of throwing on CORS block
+    if (res.ok) return res;
+    throw new Error(`HTTP ${res.status}`);
+  } catch {
+    // Direct fetch failed — try via CORS proxy
+    const proxied = await fetch(CORS_PROXY + encodeURIComponent(url));
+    if (!proxied.ok) throw new Error(`Proxy error: ${proxied.status} ${proxied.statusText}`);
+    return proxied;
+  }
+}
 
 /**
  * Fetch all tossups whose answer matches `answerQuery`.
@@ -29,22 +55,18 @@ export async function fetchTossups(answerQuery, { maxQuestions = 150, pageSize =
       queryString:      answerQuery,
       questionType:     'tossup',
       searchType:       'answer',
-      exactPhrase:      true,
       maxReturnLength:  pageSize,
       tossupPagination: page,
     });
 
-    const res = await fetch(`${BASE}/query?${params}`);
-    if (!res.ok) throw new Error(`QBreader API error: ${res.status} ${res.statusText}`);
-
+    const url = `${QBREADER}/query?${params}`;
+    const res = await fetchWithFallback(url);
     const data = await res.json();
-    console.log('[api] raw response:', data);
-    const batch = data.tossups?.questionArray ?? [];
 
-    if (!batch.length) break;   // no more results
+    const batch = data.tossups?.questionArray ?? [];
+    if (!batch.length) break;
     tossups.push(...batch);
 
-    // If we got fewer than a full page, there are no more pages
     if (batch.length < pageSize) break;
     page++;
   }
